@@ -18,7 +18,6 @@ class DocumentController extends Controller
      */
     public function index(Request $request)
     {
-        // JANGAN authorize viewAny kat sini – Afdzal akan handle sendiri ikut role
         $user = $request->user();
         $role = strtolower((string) $user->role);
 
@@ -77,7 +76,8 @@ class DocumentController extends Controller
             'description'   => 'nullable|string',
             'department_id' => 'required|integer',
             'category_id'   => 'required|integer',
-            'access_level'  => 'required|in:public,private',
+            // ikut spec: public / department / private
+            'access_level'  => 'required|in:public,department,private',
             'file'          => 'required|file|max:10240', // 10MB
         ]);
 
@@ -90,7 +90,7 @@ class DocumentController extends Controller
 
         // simpan file & metadata
         $file = $request->file('file');
-        $path = $file->store('documents', 'public');
+        $path = $file->store('documents', 'public'); // storage/app/public/documents
 
         $doc = Document::create([
             'title'         => $data['title'],
@@ -128,7 +128,7 @@ class DocumentController extends Controller
             'description'   => 'sometimes|nullable|string',
             'department_id' => 'sometimes|required|integer',
             'category_id'   => 'sometimes|required|integer',
-            'access_level'  => 'sometimes|required|in:public,private',
+            'access_level'  => 'sometimes|required|in:public,department,private',
             'file'          => 'sometimes|file|max:10240',
         ]);
 
